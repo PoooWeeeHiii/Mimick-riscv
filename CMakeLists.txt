@@ -25,6 +25,7 @@ set (I386 "^(i[3-7]|x)86$")
 set (AMD64 "^(x86_|x86-|AMD|amd|x)64$")
 set (ARM32 "^(arm|ARM|A)(32|v7l|v6l)?$")
 set (ARM64 "^(arm|ARM|A|aarch|AARCH)64$")
+set (RISCV64 "^(riscv64)$")  # <-- 新增：匹配 riscv64 架构
 
 if (MIMICK_TARGET_ARCH)
   set(_ARCH "${MIMICK_TARGET_ARCH}")
@@ -89,6 +90,12 @@ else ()
     set (MMK_ABI "aarch64")
     set (MMK_BITS 64)
     set (MMK_ARCH_ARM64 1)
+  elseif (_ARCH MATCHES "${RISCV64}")  # <-- 新增：riscv64 分支
+    message (WARNING "Mimick: riscv64 is not officially supported; building with generic settings.")
+    set (MMK_ARCH "riscv64")
+    set (MMK_ABI "systemv")
+    set (MMK_BITS 64)
+    set (MMK_ARCH_RISCV64 1)
   else ()
     message (FATAL_ERROR "Architecture '${_ARCH}' is not supported.")
   endif ()
@@ -216,7 +223,7 @@ add_subdirectory (sample)
 install(EXPORT mimick-targets DESTINATION lib/cmake/mimick)
 include(CMakePackageConfigHelpers)
 configure_package_config_file(
-	"mimickConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mimickConfig.cmake"
-	INSTALL_DESTINATION "lib/cmake/mimick"
+  "mimickConfig.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/mimickConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake/mimick"
 )
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mimickConfig.cmake" DESTINATION "lib/cmake/mimick")
